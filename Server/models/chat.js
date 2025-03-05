@@ -2,21 +2,19 @@ const mongoose = require("mongoose");
 
 const chatSchema = new mongoose.Schema(
   {
-    members: {
-      type: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Users",
-        },
-      ],
-      lastMessage: {
+    members: [
+      {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Messages",
+        ref: "Users",
       },
-      unreadMessageCount: {
-        type: Number,
-        default: 0,
-      },
+    ],
+    lastMessage: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Messages",
+    },
+    unreadMessageCount: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }
