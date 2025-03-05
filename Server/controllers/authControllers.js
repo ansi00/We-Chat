@@ -33,14 +33,25 @@ router.post("/signup", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).send({
+        message: "Email and password are required",
+        success: false,
+      });
+    }
+
+    const user = await User.findOne({ email }).select("+password");
+
     if (!user) {
       return res.status(400).send({
         message: "User does not exist",
         success: false,
       });
     }
-    const isValid = await bcrypt.compare(req.body.password, user.password);
+
+    const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
       return res.status(400).send({
         message: "Wrong Password",
@@ -58,7 +69,7 @@ router.post("/login", async (req, res) => {
       token: token,
     });
   } catch (error) {
-    res.send({
+    res.status(500).send({
       message: error.message,
       success: false,
     });
