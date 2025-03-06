@@ -7,7 +7,7 @@ router.post("/signup", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (user) {
-      return res.status(400).send({
+      return res.send({
         message: " User already exists",
         success: false,
       });
@@ -19,7 +19,7 @@ router.post("/signup", async (req, res) => {
     const newUser = new User(req.body);
     await newUser.save();
 
-    return res.status(201).send({
+    return res.send({
       message: " User created successfully",
       success: true,
     });
@@ -36,7 +36,7 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).send({
+      return res.send({
         message: "Email and password are required",
         success: false,
       });
@@ -45,7 +45,7 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
-      return res.status(400).send({
+      return res.send({
         message: "User does not exist",
         success: false,
       });
@@ -53,7 +53,7 @@ router.post("/login", async (req, res) => {
 
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
-      return res.status(400).send({
+      return res.send({
         message: "Wrong Password",
         success: false,
       });
@@ -69,7 +69,7 @@ router.post("/login", async (req, res) => {
       token: token,
     });
   } catch (error) {
-    res.status(500).send({
+    res.send({
       message: error.message,
       success: false,
     });
