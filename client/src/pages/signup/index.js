@@ -1,9 +1,13 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { signUpUser } from "../../apiCalls/auth";
 import { toast } from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { hideLoader, showLoader } from "../../redux/loaderSlice";
 
 export default function Signup() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [user, setUser] = useState({
     firstname: "",
     lastname: "",
@@ -15,13 +19,17 @@ export default function Signup() {
     e.preventDefault();
     let response = null;
     try {
+      dispatch(showLoader());
       response = await signUpUser(user);
+      dispatch(hideLoader());
       if (response.successs) {
         toast.success(response.message);
+        navigate("/login");
       } else {
         toast.error(response.message);
       }
     } catch (error) {
+      dispatch(hideLoader());
       toast.error(response.message);
     }
   }
