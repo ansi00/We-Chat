@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getLoggedUser } from "../apiCalls/users";
+import { getLoggedUser, getAllUsers } from "../apiCalls/users";
 import { useDispatch, useSelector } from "react-redux";
 import { hideLoader, showLoader } from "../redux/loaderSlice";
 import { toast } from "react-hot-toast";
-import { setUser } from "../redux/userSlice";
+import { setAllUsers, setUser } from "../redux/userSlice";
 
 export default function ProtectedRoute({ children }) {
   const { user } = useSelector((state) => state.userReducer);
@@ -29,9 +29,28 @@ export default function ProtectedRoute({ children }) {
     }
   };
 
+  const getAllUsersFromDB = async () => {
+    let response = null;
+    try {
+      dispatch(showLoader());
+      response = await getAllUsers();
+      dispatch(hideLoader());
+      if (response.success) {
+        dispatch(setAllUsers(response.data));
+      } else {
+        toast.error(response.message);
+        navigate("/login");
+      }
+    } catch (error) {
+      dispatch(hideLoader());
+      navigate("/login");
+    }
+  };
+
   useEffect(() => {
     if (localStorage.getItem("token")) {
       getLoggedInUser();
+      getAllUsersFromDB();
     } else {
       navigate("/login");
     }
