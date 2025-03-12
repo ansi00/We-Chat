@@ -1,8 +1,36 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-hot-toast";
+import { createNewChat } from "../../../apiCalls/chat";
+import { hideLoader, showLoader } from "../../../redux/loaderSlice";
+import { setAllChats } from "../../../redux/userSlice";
 
 export default function UserList({ searchKey }) {
-  const { allUsers, allChats } = useSelector((state) => state.userReducer);
+  const {
+    allUsers,
+    allChats,
+    user: currentUser,
+  } = useSelector((state) => state.userReducer);
+  const dispatch = useDispatch();
+
+  const startNewChat = async (searchedUserId) => {
+    let response = null;
+    try {
+      dispatch(showLoader());
+      response = await createNewChat([currentUser._id, searchedUserId]);
+      dispatch(hideLoader());
+      if (response.success) {
+        toast.success(response.message);
+        const newChat = response.data;
+        const updatedChat = [...allChats, newChat];
+        dispatch(setAllChats(updatedChat));
+      }
+    } catch (error) {
+      toast.error(response.message);
+      dispatch(hideLoader());
+    }
+  };
+
   return allUsers
     .filter((user) => {
       return (
@@ -14,31 +42,36 @@ export default function UserList({ searchKey }) {
     })
     .map((user) => {
       return (
-        <div class="user-search-filter">
-          <div class="filtered-user">
-            <div class="filter-user-display">
+        <div className="user-search-filter">
+          <div className="filtered-user">
+            <div className="filter-user-display">
               {user.profilePic && (
                 <img
                   src={user.profilePic}
                   alt="Profile Pic"
-                  class="user-profile-image"
+                  className="user-profile-image"
                 />
               )}
               {!user.profilePic && (
-                <div class="user-default-profile-pic">
+                <div className="user-default-profile-pic">
                   {user.firstname.charAt(0).toUpperCase() +
                     user.lastname.charAt(0).toUpperCase()}
                 </div>
               )}
-              <div class="filter-user-details">
-                <div class="user-display-name">
+              <div className="filter-user-details">
+                <div className="user-display-name">
                   {user.firstname + " " + user.lastname}
                 </div>
-                <div class="user-display-email">{user.email}</div>
+                <div className="user-display-email">{user.email}</div>
               </div>
               {!allChats.find((chat) => chat.members.includes(user._id)) && (
-                <div class="user-start-chat">
-                  <button class="user-start-chat-btn">Start Chat</button>
+                <div className="user-start-chat">
+                  <button
+                    onClick={() => startNewChat(user._id)}
+                    className="user-start-chat-btn"
+                  >
+                    Start Chat
+                  </button>
                 </div>
               )}
             </div>
