@@ -254,6 +254,14 @@ i {
   background-color: white;
 }
 
+.selected-user {
+  border-bottom: #ccc 1px solid;
+  padding: 10px 10px;
+  color: white;
+  cursor: pointer;
+  background-color: #e74c3c;
+}
+
 .filter-user-display {
   display: flex;
   flex-wrap: wrap;
@@ -271,19 +279,30 @@ i {
   font-size: 12px;
 }
 
-.user-default-profile-pic,
+.user-default-avatar,
+.user-selected-avatar,
 .user-profile-image {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: #e74c3c;
-  color: white;
+
   font-size: 22px;
   font-weight: bold;
   text-align: center;
   vertical-align: middle;
   line-height: 50px;
 }
+
+.user-default-avatar {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.user-selected-avatar {
+  background-color: white;
+  color: #e74c3c;
+}
+
 .user-start-chat {
   padding: 10px 0px;
 }
@@ -293,4 +312,22 @@ i {
   border-radius: 3px;
   background-color: #e74c3c;
   color: white;
+}
+
+/* for chat area */
+.app-chat-area {
+  background-color: white;
+  width: 70%;
+  padding: 20px 30px;
+  border-radius: 10px;
+}
+
+/* for chat-area-header */
+.app-chat-area-header {
+  padding: 10px 30px;
+  margin-bottom: 20px;
+  border-bottom: #bbb 1px solid;
+  text-align: right;
+  font-weight: bold;
+  color: #e74c3c;
 }
