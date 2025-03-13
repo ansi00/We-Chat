@@ -56,6 +56,15 @@ export default function ChatArea() {
     }
   };
 
+  function formatName(user) {
+    let fname =
+      user.firstname.at(0).toUpperCase() +
+      user.firstname.slice(1).toLowerCase();
+    let lname =
+      user.lastname.at(0).toUpperCase() + user.lastname.slice(1).toLowerCase();
+    return fname + " " + lname;
+  }
+
   useEffect(() => {
     getMessages();
   }, [selectedChat]);
@@ -64,9 +73,7 @@ export default function ChatArea() {
     <>
       {selectedChat && (
         <div className="app-chat-area">
-          <div className="app-chat-area-header">
-            {selectedUser.firstname + " " + selectedUser.lastname}
-          </div>
+          <div className="app-chat-area-header">{formatName(selectedUser)}</div>
           <div className="main-chat-area">
             {allMessages.map((msg) => {
               const isCurrentUserSender = msg.sender === user._id;

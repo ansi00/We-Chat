@@ -23,6 +23,7 @@ router.get("/get-all-chats", authMiddleware, async (req, res) => {
   try {
     const allChats = await Chat.find({ members: { $in: req.body.userId } })
       .populate("members")
+      .populate("lastMessage")
       .sort({ updatedAt: -1 });
 
     res.status(200).send({
