@@ -364,3 +364,28 @@ i {
   background-color: transparent;
   margin-top: 5px;
 }
+
+/* for Chat Messages */
+.message-container {
+  display: flex;
+}
+.send-message,
+.received-message {
+  padding: 10px 20px;
+  margin-top: 5px;
+  border-radius: 3px;
+  font-size: 14px;
+  width: fit-content;
+}
+
+.send-message {
+  background-color: #e74c3c;
+  color: white;
+  margin-left: 100px;
+}
+
+.received-message {
+  background-color: #ddd;
+  color: #28282b;
+  margin-right: 100px;
+}
