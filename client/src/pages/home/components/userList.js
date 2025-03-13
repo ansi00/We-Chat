@@ -57,7 +57,7 @@ export default function UserList({ searchKey }) {
     const chat = allChats.find((chat) =>
       chat.members.map((m) => m._id).includes(userId)
     );
-    if (!chat) {
+    if (!chat || !chat.lastMessage) {
       return "";
     } else {
       const msgPrefix =
@@ -70,7 +70,7 @@ export default function UserList({ searchKey }) {
     const chat = allChats.find((chat) =>
       chat.members.map((m) => m._id).includes(userId)
     );
-    if (!chat && chat?.lastMessage) {
+    if (!chat || chat?.lastMessage) {
       return "";
     } else {
       return moment(chat?.lastMessage?.createdAt).format("hh:mm A");

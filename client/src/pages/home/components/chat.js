@@ -4,10 +4,13 @@ import { hideLoader, showLoader } from "../../../redux/loaderSlice";
 import { toast } from "react-hot-toast";
 import { useEffect, useState } from "react";
 import moment from "moment";
+import { clearUnreadMessageCount } from "../../../apiCalls/chat";
 
 export default function ChatArea() {
   const dispatch = useDispatch();
-  const { selectedChat, user } = useSelector((state) => state.userReducer);
+  const { selectedChat, user, allChats } = useSelector(
+    (state) => state.userReducer
+  );
   const selectedUser = selectedChat.members.find((u) => u._id !== user._id);
   const [message, setMessage] = useState("");
   const [allMessages, setAllMessages] = useState([]);
@@ -44,6 +47,25 @@ export default function ChatArea() {
     }
   };
 
+  const clearUnreadMessages = async () => {
+    try {
+      dispatch(showLoader());
+      const response = await clearUnreadMessageCount(selectedChat._id);
+      dispatch(hideLoader());
+      if (response.success) {
+        allChats.map((chat) => {
+          if (chat._id === selectedChat._id) {
+            return response.data;
+          }
+          return chat;
+        });
+      }
+    } catch (error) {
+      dispatch(hideLoader());
+      toast.error(error.message);
+    }
+  };
+
   const formatTime = (timestamp) => {
     const now = moment();
     const diff = now.diff(moment(timestamp), "days");
@@ -67,6 +89,7 @@ export default function ChatArea() {
 
   useEffect(() => {
     getMessages();
+    clearUnreadMessages();
   }, [selectedChat]);
 
   return (
