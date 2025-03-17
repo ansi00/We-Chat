@@ -5,8 +5,9 @@ import { toast } from "react-hot-toast";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import { clearUnreadMessageCount } from "../../../apiCalls/chat";
+import store from "./../../../redux/store";
 
-export default function ChatArea() {
+export default function ChatArea({ socket }) {
   const dispatch = useDispatch();
   const { selectedChat, user, allChats } = useSelector(
     (state) => state.userReducer
@@ -21,14 +22,18 @@ export default function ChatArea() {
         sender: user._id,
         text: message,
       };
-      dispatch(showLoader());
+      socket.emit("send-message", {
+        ...newMessage,
+        members: selectedChat.members.map((m) => m._id),
+        read: false,
+        createdAt: moment().format("DD-MM-YYYY HH:mm:ss"),
+      });
+
       const response = await createNewMsg(newMessage);
-      dispatch(hideLoader());
       if (response.success) {
         setMessage("");
       }
     } catch (error) {
-      dispatch(hideLoader());
       toast.error(error.message);
     }
   };
@@ -92,14 +97,25 @@ export default function ChatArea() {
     if (selectedChat?.lastMessage?.sender !== user._id) {
       clearUnreadMessages();
     }
+    socket.off("receive-message").on("receive-message", (data) => {
+      const selectedState = store.getState().userReducer.selectedChat;
+      if (selectedChat._id === data.chatId) {
+        setAllMessages((prevmsg) => [...prevmsg, data]);
+      }
+    });
   }, [selectedChat]);
+
+  useEffect(() => {
+    const msgContainer = document.getElementById("main-chat-area");
+    msgContainer.scrollTop = msgContainer.scrollHeight;
+  }, [allMessages]);
 
   return (
     <>
       {selectedChat && (
         <div className="app-chat-area">
           <div className="app-chat-area-header">{formatName(selectedUser)}</div>
-          <div className="main-chat-area">
+          <div className="main-chat-area" id="main-chat-area">
             {allMessages.map((msg) => {
               const isCurrentUserSender = msg.sender === user._id;
               return (
