@@ -26,7 +26,6 @@ app.use("/api/chat", chatRouter);
 //messageController router
 app.use("/api/message", messageRouter);
 
-
 // Socket implementation
 io.on("connection", (socket) => {
   socket.on("join-room", (userid) => {
@@ -37,6 +36,12 @@ io.on("connection", (socket) => {
     io.to(message.members[0])
       .to(message.members[1])
       .emit("receive-message", message);
+  });
+
+  socket.on("clear-unread-messages", (data) => {
+    io.to(data.members[0])
+      .to(data.members[1])
+      .emit("message-count-cleared", data);
   });
 });
 

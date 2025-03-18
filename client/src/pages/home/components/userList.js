@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
 import { createNewChat } from "../../../apiCalls/chat";
 import { hideLoader, showLoader } from "../../../redux/loaderSlice";
 import { setAllChats, setSelectedChat } from "../../../redux/userSlice";
 import moment from "moment";
+import store from "../../../redux/store";
 
-export default function UserList({ searchKey }) {
+export default function UserList({ searchKey, socket }) {
   const {
     allUsers,
     allChats,
@@ -115,6 +116,27 @@ export default function UserList({ searchKey }) {
       });
     }
   }
+
+  useEffect(() => {
+    socket.on("receive-message", (message) => {
+      const selectedChat = store.getState().userReducer.selectedChat;
+      const allChats = store.getState().userReducer.allChats;
+
+      if (selectedChat?._id !== message.chatId) {
+        const updatedChats = allChats.map((chat) => {
+          if (chat._id === message.chatId) {
+            return {
+              ...chat,
+              unreadMessageCount: (chat?.unreadMessageCount || 0) + 1,
+              lastMessage: message,
+            };
+          }
+          return chat;
+        });
+        dispatch(setAllChats(updatedChats));
+      }
+    });
+  }, []);
 
   return getData().map((obj) => {
     let user = obj;

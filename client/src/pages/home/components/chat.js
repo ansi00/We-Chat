@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 import { clearUnreadMessageCount } from "../../../apiCalls/chat";
 import store from "./../../../redux/store";
+import { setAllChats } from "../../../redux/userSlice";
 
 export default function ChatArea({ socket }) {
   const dispatch = useDispatch();
@@ -26,7 +27,7 @@ export default function ChatArea({ socket }) {
         ...newMessage,
         members: selectedChat.members.map((m) => m._id),
         read: false,
-        createdAt: moment().format("DD-MM-YYYY HH:mm:ss"),
+        createdAt: moment().format("YYYY-MM-DD HH:mm:ss"),
       });
 
       const response = await createNewMsg(newMessage);
@@ -54,9 +55,11 @@ export default function ChatArea({ socket }) {
 
   const clearUnreadMessages = async () => {
     try {
-      dispatch(showLoader());
+      socket.emit("clear-unread-messages", {
+        chatId: selectedChat._id,
+        members: selectedChat.members.map((m) => m._id),
+      });
       const response = await clearUnreadMessageCount(selectedChat._id);
-      dispatch(hideLoader());
       if (response.success) {
         allChats.map((chat) => {
           if (chat._id === selectedChat._id) {
@@ -66,7 +69,6 @@ export default function ChatArea({ socket }) {
         });
       }
     } catch (error) {
-      dispatch(hideLoader());
       toast.error(error.message);
     }
   };
@@ -97,10 +99,37 @@ export default function ChatArea({ socket }) {
     if (selectedChat?.lastMessage?.sender !== user._id) {
       clearUnreadMessages();
     }
-    socket.off("receive-message").on("receive-message", (data) => {
+    socket.on("receive-message", (message) => {
       const selectedState = store.getState().userReducer.selectedChat;
+      if (selectedChat._id === message.chatId) {
+        setAllMessages((prevmsg) => [...prevmsg, message]);
+      }
+      if (selectedChat._id === message.chatId && message.sender !== user._id) {
+        clearUnreadMessages();
+      }
+    });
+
+    socket.on("message-count-cleared", (data) => {
+      const selectedChat = store.getState().userReducer.selectedChat;
+      const allChats = store.getState().userReducer.allChats;
       if (selectedChat._id === data.chatId) {
-        setAllMessages((prevmsg) => [...prevmsg, data]);
+        // updating unread message count in chat object
+        const updatedChats = allChats.map((chat) => {
+          if (chat._id === data.chatId) {
+            return {
+              ...chat,
+              unreadMessageCount: 0,
+            };
+          }
+          return chat;
+        });
+        dispatch(setAllChats(updatedChats));
+        // updating read property in message object
+        setAllMessages((prevMsgs) => {
+          return prevMsgs.map((msg) => {
+            return { ...msg, read: true };
+          });
+        });
       }
     });
   }, [selectedChat]);
