@@ -7,6 +7,7 @@ import moment from "moment";
 import { clearUnreadMessageCount } from "../../../apiCalls/chat";
 import store from "./../../../redux/store";
 import { setAllChats } from "../../../redux/userSlice";
+import EmojiPicker from "emoji-picker-react";
 
 export default function ChatArea({ socket }) {
   const dispatch = useDispatch();
@@ -17,6 +18,8 @@ export default function ChatArea({ socket }) {
   const [message, setMessage] = useState("");
   const [allMessages, setAllMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
   const sendMessage = async () => {
     try {
       const newMessage = {
@@ -34,6 +37,7 @@ export default function ChatArea({ socket }) {
       const response = await createNewMsg(newMessage);
       if (response.success) {
         setMessage("");
+        setShowEmojiPicker(false);
       }
     } catch (error) {
       toast.error(error.message);
@@ -201,6 +205,13 @@ export default function ChatArea({ socket }) {
               {isTyping && <i>typing...</i>}
             </div>
           </div>
+          {showEmojiPicker && (
+            <div>
+              <EmojiPicker
+                onEmojiClick={(e) => setMessage(message + e.emoji)}
+              />
+            </div>
+          )}
           <div className="send-message-div">
             <input
               type="text"
@@ -216,6 +227,13 @@ export default function ChatArea({ socket }) {
               className="send-message-input"
               placeholder="Type a message"
             />
+            <button
+              className="fa fa-smile-o send-emoji-btn"
+              onClick={() => {
+                setShowEmojiPicker(!showEmojiPicker);
+              }}
+              aria-hidden="true"
+            ></button>
             <button
               className="fa fa-paper-plane send-message-btn"
               onClick={sendMessage}

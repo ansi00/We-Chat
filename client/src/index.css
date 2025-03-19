@@ -394,6 +394,17 @@ i {
   margin-top: 5px;
 }
 
+.send-emoji-btn {
+  position: absolute;
+  right: 50px;
+  font-size: 25px;
+  color: #e74c3c;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  margin-top: 5px;
+}
+
 /* for Chat Messages */
 .message-container {
   display: flex;
