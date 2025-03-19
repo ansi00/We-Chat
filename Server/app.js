@@ -26,6 +26,8 @@ app.use("/api/chat", chatRouter);
 //messageController router
 app.use("/api/message", messageRouter);
 
+const onlineUsers = [];
+
 // Socket implementation
 io.on("connection", (socket) => {
   socket.on("join-room", (userid) => {
@@ -45,9 +47,14 @@ io.on("connection", (socket) => {
   });
 
   socket.on("user-typing", (data) => {
-    io.to(data.members[0])
-    .to(data.members[1])
-    .emit("started-typing", data);
+    io.to(data.members[0]).to(data.members[1]).emit("started-typing", data);
+  });
+
+  socket.on("user-login", (userid) => {
+    if (!onlineUsers.includes(userid)) {
+      onlineUsers.push(userid);
+    }
+    socket.emit("online-users", onlineUsers);
   });
 });
 
