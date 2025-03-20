@@ -1,8 +1,10 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
   const { user } = useSelector((state) => state.userReducer);
+  const navigate = useNavigate();
 
   function getFullName() {
     let fname =
@@ -27,7 +29,12 @@ export default function Header() {
       </div>
       <div className="app-user-profile">
         <div className="logged-user-name">{getFullName()}</div>
-        <div className="logged-user-profile-pic">{getInitials()}</div>
+        <div
+          className="logged-user-profile-pic"
+          onClick={() => navigate("/profile")}
+        >
+          {getInitials()}
+        </div>
       </div>
     </div>
   );
