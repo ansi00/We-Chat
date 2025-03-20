@@ -29,12 +29,22 @@ export default function Header() {
       </div>
       <div className="app-user-profile">
         <div className="logged-user-name">{getFullName()}</div>
-        <div
-          className="logged-user-profile-pic"
-          onClick={() => navigate("/profile")}
-        >
-          {getInitials()}
-        </div>
+        {user?.profilePic && (
+          <img
+            src={user?.profilePic}
+            alt="profile-pic"
+            className="logged-user-profile-pic"
+            onClick={() => navigate("/profile")}
+          />
+        )}
+        {!user?.profilePic && (
+          <div
+            className="logged-user-profile-pic"
+            onClick={() => navigate("/profile")}
+          >
+            {getInitials()}
+          </div>
+        )}
       </div>
     </div>
   );
