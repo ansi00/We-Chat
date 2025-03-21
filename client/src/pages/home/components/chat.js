@@ -20,13 +20,15 @@ export default function ChatArea({ socket }) {
   const [isTyping, setIsTyping] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  const sendMessage = async () => {
+  const sendMessage = async (image = null) => {
     try {
       const newMessage = {
         chatId: selectedChat._id,
         sender: user._id,
         text: message,
+        image: image,
       };
+
       socket.emit("send-message", {
         ...newMessage,
         members: selectedChat.members.map((m) => m._id),
@@ -98,6 +100,15 @@ export default function ChatArea({ socket }) {
       user.lastname.at(0).toUpperCase() + user.lastname.slice(1).toLowerCase();
     return fname + " " + lname;
   }
+
+  const sendImg = async (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader(file);
+    reader.readAsDataURL(file);
+    reader.onloadend = async () => {
+      sendMessage(reader.result);
+    };
+  };
 
   useEffect(() => {
     getMessages();
@@ -178,7 +189,17 @@ export default function ChatArea({ socket }) {
                           : "received-message"
                       }
                     >
-                      {msg.text}
+                      <div>{msg.text}</div>
+                      <div>
+                        {msg.image && (
+                          <img
+                            src={msg.image}
+                            alt="image"
+                            height="120"
+                            width="120"
+                          ></img>
+                        )}
+                      </div>
                     </div>
                     <div
                       className="message-timestamp"
@@ -206,8 +227,16 @@ export default function ChatArea({ socket }) {
             </div>
           </div>
           {showEmojiPicker && (
-            <div>
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                padding: "0px 20px",
+                justifyContent: "right",
+              }}
+            >
               <EmojiPicker
+                style={{ width: "300px", height: "400px" }}
                 onEmojiClick={(e) => setMessage(message + e.emoji)}
               />
             </div>
@@ -227,6 +256,16 @@ export default function ChatArea({ socket }) {
               className="send-message-input"
               placeholder="Type a message"
             />
+            <label htmlFor="file">
+              <i className="fa fa-picture-o send-image-btn"></i>
+              <input
+                type="file"
+                id="file"
+                style={{ display: "none" }}
+                accept="image/jpg,image/png,image/jpeg,image/gif"
+                onChange={sendImg}
+              />
+            </label>
             <button
               className="fa fa-smile-o send-emoji-btn"
               onClick={() => {
@@ -236,7 +275,7 @@ export default function ChatArea({ socket }) {
             ></button>
             <button
               className="fa fa-paper-plane send-message-btn"
-              onClick={sendMessage}
+              onClick={() => sendMessage(null)}
               aria-hidden="true"
             ></button>
           </div>
