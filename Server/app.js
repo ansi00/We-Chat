@@ -56,6 +56,11 @@ io.on("connection", (socket) => {
     }
     socket.emit("online-users", onlineUsers);
   });
+
+  socket.on("user-logout", (userid) => {
+    onlineUsers.splice(onlineUsers.indexOf(userid), 1);
+    io.emit("online-users-updated", onlineUsers);
+  });
 });
 
 module.exports = server;

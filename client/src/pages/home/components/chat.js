@@ -20,7 +20,7 @@ export default function ChatArea({ socket }) {
   const [isTyping, setIsTyping] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  const sendMessage = async (image = null) => {
+  const sendMessage = async (image) => {
     try {
       const newMessage = {
         chatId: selectedChat._id,
@@ -275,7 +275,7 @@ export default function ChatArea({ socket }) {
             ></button>
             <button
               className="fa fa-paper-plane send-message-btn"
-              onClick={() => sendMessage(null)}
+              onClick={() => sendMessage("")}
               aria-hidden="true"
             ></button>
           </div>

@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-export default function Header() {
+export default function Header({ socket }) {
   const { user } = useSelector((state) => state.userReducer);
   const navigate = useNavigate();
 
@@ -21,6 +21,12 @@ export default function Header() {
     let lChar = user?.lastname.toUpperCase()[0];
     return fChar + lChar;
   }
+  function logout() {
+    localStorage.removeItem("token");
+    navigate("/login");
+    socket.emit("user-logout", user._id);
+  }
+
   return (
     <div className="app-header">
       <div className="app-logo">
@@ -28,7 +34,6 @@ export default function Header() {
         We Chat
       </div>
       <div className="app-user-profile">
-        <div className="logged-user-name">{getFullName()}</div>
         {user?.profilePic && (
           <img
             src={user?.profilePic}
@@ -45,6 +50,10 @@ export default function Header() {
             {getInitials()}
           </div>
         )}
+        <div className="logged-user-name">{getFullName()}</div>
+        <button className="logout-btn" onClick={logout}>
+          <i className="fa fa-power-off"></i>
+        </button>
       </div>
     </div>
   );
