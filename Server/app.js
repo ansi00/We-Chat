@@ -38,6 +38,10 @@ io.on("connection", (socket) => {
     io.to(message.members[0])
       .to(message.members[1])
       .emit("receive-message", message);
+
+    io.to(message.members[0])
+      .to(message.members[1])
+      .emit("set-message-count", message);
   });
 
   socket.on("clear-unread-messages", (data) => {
@@ -54,12 +58,15 @@ io.on("connection", (socket) => {
     if (!onlineUsers.includes(userid)) {
       onlineUsers.push(userid);
     }
-    socket.emit("online-users", onlineUsers);
+    io.emit("online-users", onlineUsers);
   });
 
   socket.on("user-logout", (userid) => {
-    onlineUsers.splice(onlineUsers.indexOf(userid), 1);
-    io.emit("online-users-updated", onlineUsers);
+    const index = onlineUsers.indexOf(userid);
+    if (index !== -1) {
+      onlineUsers.splice(index, 1);
+    }
+    io.emit("online-users", onlineUsers);
   });
 });
 

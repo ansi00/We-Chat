@@ -106,19 +106,20 @@ export default function UserList({ searchKey, socket, onlineUser }) {
 
   function getData() {
     if (searchKey === "") {
-      return allChats;
+      return allChats || [];
     } else {
-      allUsers.filter((user) => {
-        return (
-          user.firstname?.toLowerCase().includes(searchKey.toLowerCase()) ||
-          user.lastname?.toLowerCase().includes(searchKey.toLowerCase())
-        );
-      });
+      return (
+        allUsers?.filter(
+          (user) =>
+            user.firstname?.toLowerCase().includes(searchKey.toLowerCase()) ||
+            user.lastname?.toLowerCase().includes(searchKey.toLowerCase())
+        ) || []
+      );
     }
   }
 
   useEffect(() => {
-    socket.on("receive-message", (message) => {
+    socket.off("set-message-count").on("set-message-count", (message) => {
       const selectedChat = store.getState().userReducer.selectedChat;
       let allChats = store.getState().userReducer.allChats;
 

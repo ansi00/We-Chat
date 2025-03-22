@@ -14,14 +14,21 @@ export default function Home() {
     if (user) {
       socket.emit("join-room", user._id);
       socket.emit("user-login", user._id);
-      socket.on("online-users", (onlineusers) => {
-        setOnlineUser(onlineusers);
-      });
-      socket.on("online-users-updated", (onlineusers) => {
-        setOnlineUser(onlineusers);
-      });
+
+      const handleOnlineUsers = (onlineusers) => {
+        setOnlineUser([...onlineusers]);
+      };
+
+      socket.on("online-users", handleOnlineUsers);
+      socket.on("online-users-updated", handleOnlineUsers);
+
+      return () => {
+        socket.off("online-users", handleOnlineUsers);
+        socket.off("online-users-updated", handleOnlineUsers);
+      };
     }
   }, [user]);
+
   return (
     <div className="home-page">
       <Header socket={socket} />
