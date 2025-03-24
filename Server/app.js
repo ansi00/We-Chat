@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const authRouter = require("./controllers/authControllers");
 const userRouter = require("./controllers/userController");
 const chatRouter = require("./controllers/chatController");
@@ -6,6 +7,7 @@ const messageRouter = require("./controllers/messageController");
 const app = express();
 
 // authController router
+app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
